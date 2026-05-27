@@ -8,12 +8,15 @@ if [ -f /data/params ]; then
     set +a
 fi
 
-export MONGO_URL="${MONGO_URL:-mongodb://mongodb:27017/orders}"
-export AMQP_HOST="${AMQP_HOST:-rabbitmq}"
-export AMQP_USER="${AMQP_USER:-guest}"
-export AMQP_PASS="${AMQP_PASS:-guest}"
-export SHIPPING_URL="${SHIPPING_URL:-http://${SHIPPING_HOST:-roboshop-shipping}:${SHIPPING_PORT:-8080}}"
-export NOTIFICATION_URL="${NOTIFICATION_URL:-http://notification:8080}"
-export PORT="${PORT:-8080}"
+: "${MONGO_URL:?MONGO_URL is required}"
+: "${AMQP_HOST:?AMQP_HOST is required}"
+: "${AMQP_USER:?AMQP_USER is required}"
+: "${AMQP_PASS:?AMQP_PASS is required}"
+: "${SHIPPING_HOST:?SHIPPING_HOST is required}"
+: "${SHIPPING_PORT:?SHIPPING_PORT is required}"
+: "${PORT:?PORT is required}"
+
+export MONGO_URL AMQP_HOST AMQP_USER AMQP_PASS PORT
+export SHIPPING_URL="http://${SHIPPING_HOST}:${SHIPPING_PORT}"
 
 exec java -jar orders.jar
