@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Component
 public class OrderListener {
@@ -17,19 +18,20 @@ public class OrderListener {
     private static final Logger logger = LoggerFactory.getLogger(OrderListener.class);
 
     private final OrderRepository orderRepository;
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
 
-    @Value("${notification.url:http://notification:8008}")
+    @Value("${notification.url:http://roboshop-frontend:8080}")
     private String notificationUrl;
 
     @Value("${shipping.url:http://shipping:8004}")
     private String shippingUrl;
 
-    public OrderListener(OrderRepository orderRepository) {
+    public OrderListener(OrderRepository orderRepository, RestTemplate restTemplate) {
         this.orderRepository = orderRepository;
+        this.restTemplate = restTemplate;
     }
 
-    @RabbitListener(queues = "orders")
+    @RabbitListener(queues = "orders", concurrency = "2-5")
     public void handleOrderEvent(Map<String, Object> event) {
         logger.info("Received order event for user: {}", event.get("userId"));
 
@@ -79,22 +81,27 @@ public class OrderListener {
             }
 
             Order saved = orderRepository.save(order);
-            logger.info("Order saved: {}", saved.getId());
+            logger.info("Order saved: {} userId={}", saved.getId(), saved.getUserId());
 
-            // Trigger notification
-            try {
-                Map<String, Object> notification = Map.of(
-                        "orderId", saved.getId(),
-                        "email", order.getUserEmail(),
-                        "name", order.getUserName(),
-                        "total", order.getTotal() + order.getShippingCost()
-                );
-                restTemplate.postForObject(notificationUrl + "/notification/send", notification, String.class);
-            } catch (Exception e) {
-                logger.warn("Failed to send notification: {}", e.getMessage());
-            }
+            // Fire-and-forget: must not block the RabbitMQ consumer (was timing out ~2min on port 80).
+            CompletableFuture.runAsync(() -> sendNotification(saved, order));
         } catch (Exception e) {
             logger.error("Failed to process order event: {}", e.getMessage(), e);
+        }
+    }
+
+    private void sendNotification(Order saved, Order order) {
+        try {
+            Map<String, Object> notification = Map.of(
+                    "orderId", saved.getId(),
+                    "email", order.getUserEmail(),
+                    "name", order.getUserName(),
+                    "total", order.getTotal() + order.getShippingCost()
+            );
+            restTemplate.postForObject(notificationUrl + "/notification/send", notification, String.class);
+            logger.info("Notification sent for order {}", saved.getId());
+        } catch (Exception e) {
+            logger.warn("Failed to send notification for order {}: {}", saved.getId(), e.getMessage());
         }
     }
 }
