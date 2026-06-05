@@ -20,6 +20,9 @@ public class OrderListener {
     private final OrderRepository orderRepository;
     private final RestTemplate restTemplate;
 
+    @Value("${notification.enabled:false}")
+    private boolean notificationEnabled;
+
     @Value("${notification.url:http://roboshop-frontend:8080}")
     private String notificationUrl;
 
@@ -83,8 +86,10 @@ public class OrderListener {
             Order saved = orderRepository.save(order);
             logger.info("Order saved: {} userId={}", saved.getId(), saved.getUserId());
 
-            // Fire-and-forget: must not block the RabbitMQ consumer (was timing out ~2min on port 80).
-            CompletableFuture.runAsync(() -> sendNotification(saved, order));
+            if (notificationEnabled) {
+                // Fire-and-forget: must not block the RabbitMQ consumer.
+                CompletableFuture.runAsync(() -> sendNotification(saved, order));
+            }
         } catch (Exception e) {
             logger.error("Failed to process order event: {}", e.getMessage(), e);
         }

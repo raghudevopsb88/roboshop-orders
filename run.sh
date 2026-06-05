@@ -18,6 +18,9 @@ fi
 
 export MONGO_URL AMQP_HOST AMQP_USER AMQP_PASS PORT
 export SHIPPING_URL="http://${SHIPPING_HOST}:${SHIPPING_PORT}"
+if [ -n "${NOTIFICATION_ENABLED:-}" ]; then
+    export NOTIFICATION_ENABLED
+fi
 if [ -n "${NOTIFICATION_URL:-}" ]; then
     export NOTIFICATION_URL
 fi
