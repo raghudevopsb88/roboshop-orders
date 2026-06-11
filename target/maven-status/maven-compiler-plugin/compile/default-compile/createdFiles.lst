@@ -1,9 +1,0 @@
-com/roboshop/orders/OrdersApplication.class
-com/roboshop/orders/listener/OrderListener.class
-com/roboshop/orders/model/Order.class
-com/roboshop/orders/model/Order$OrderItem.class
-com/roboshop/orders/repository/OrderRepository.class
-com/roboshop/orders/controller/OrderController.class
-com/roboshop/orders/config/RequestLoggingFilter.class
-com/roboshop/orders/config/RestTemplateConfig.class
-com/roboshop/orders/config/RabbitConfig.class

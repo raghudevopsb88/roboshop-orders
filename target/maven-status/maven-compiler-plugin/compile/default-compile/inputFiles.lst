@@ -1,8 +1,0 @@
-/Users/skalluru/repos/cit/d88/02-APP/roboshop-orders/src/main/java/com/roboshop/orders/config/RestTemplateConfig.java
-/Users/skalluru/repos/cit/d88/02-APP/roboshop-orders/src/main/java/com/roboshop/orders/config/RabbitConfig.java
-/Users/skalluru/repos/cit/d88/02-APP/roboshop-orders/src/main/java/com/roboshop/orders/listener/OrderListener.java
-/Users/skalluru/repos/cit/d88/02-APP/roboshop-orders/src/main/java/com/roboshop/orders/OrdersApplication.java
-/Users/skalluru/repos/cit/d88/02-APP/roboshop-orders/src/main/java/com/roboshop/orders/controller/OrderController.java
-/Users/skalluru/repos/cit/d88/02-APP/roboshop-orders/src/main/java/com/roboshop/orders/repository/OrderRepository.java
-/Users/skalluru/repos/cit/d88/02-APP/roboshop-orders/src/main/java/com/roboshop/orders/config/RequestLoggingFilter.java
-/Users/skalluru/repos/cit/d88/02-APP/roboshop-orders/src/main/java/com/roboshop/orders/model/Order.java
