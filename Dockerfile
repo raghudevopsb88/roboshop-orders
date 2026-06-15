@@ -6,7 +6,9 @@ COPY src ./src
 RUN mvn clean package -DskipTests -B
 
 FROM docker.io/redhat/ubi9:latest
-RUN dnf install -y java-17-openjdk-headless && dnf clean all
+RUN dnf install -y java-17-openjdk-headless \
+    && dnf update -y \
+    && dnf clean all
 WORKDIR /app
 COPY --from=builder /app/target/orders.jar .
 COPY run.sh /run.sh
